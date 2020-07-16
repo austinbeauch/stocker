@@ -36,11 +36,6 @@ def model_criterion(config):
 
 
 def train(config):
-    # TODO: Change input to be an optimizable torch variable?
-    # TODO: Train on price *differences* versus absolute price values (even if they are scaled to -1,1)
-    # TODO: Include volume?
-    # TODO: Add model dropout
-
     # does this ever change? I don't think so?
     input_dim = 1
 
@@ -93,7 +88,6 @@ def train(config):
     best_model_file = os.path.join(config.save_dir, f"best_{config.model_type}.pth")
 
     model.train()
-    hist = np.zeros(config.epochs)
 
     for epoch in range(config.epochs):
         prefix = "Training Epoch {:3d}: ".format(epoch)
@@ -114,13 +108,6 @@ def train(config):
             loss.backward()
             optimizer.step()
             optimizer.zero_grad()
-
-            # x = x.squeeze().cpu()
-            # y = y.squeeze().cpu()
-            # predictions = predictions.cpu()
-            # plot_ticker(x, y, predictions, ticker=ticker)
-
-            hist[epoch] += loss.item()
 
             if iter_idx % config.rep_intv == 0:
                 tr_writer.add_scalar("loss", loss, global_step=iter_idx)
@@ -158,11 +145,6 @@ def train(config):
                     "optimizer": optimizer.state_dict(),
                     "scaler": scaler,
                 }, best_model_file)
-
-
-    import matplotlib.pyplot as plt
-    plt.plot(hist)
-    plt.show()
 
 
 def test(config):
